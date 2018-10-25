@@ -10,8 +10,8 @@ let mockPlaces = [
     {
         name: 'Torre de TV',
         description: 'Torre de transmissão de TV analógica inaugurada em 1967',
-        lat: -15.7942287,
-        lng: -47.8821658,
+        lat: -15.789632,
+        lng: -47.894358,
         wikiArticlesUrls: []
     },
     {
@@ -49,11 +49,12 @@ let ViewModel = function () {
 
     let self = this;
     this.markers = [];
+    this.wikipediaArticles = []
     
     //cria o mapa onde são informadas as coordenadas e o zoom inicial do mapa
     this.map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: -15.7801, lng: -47.9292},
-        zoom: 14
+        zoom: 15
     });
 
     this.places = ko.observableArray([]);
@@ -61,7 +62,8 @@ let ViewModel = function () {
     mockPlaces.forEach(function(place) {
         self.places.push(new Place(place));
     });
-    
+
+    getWikiArticlesUrls();
     this.largeInfoWindow = new google.maps.InfoWindow();
     this.bounds = new google.maps.LatLngBounds();
 
@@ -79,6 +81,18 @@ let ViewModel = function () {
         });
         self.markers.push(marker);
         marker.addListener('click', function() {
+            populateInfoWindow(this, self.largeInfoWindow, place);
+        });
+        self.bounds.extend(self.markers[index].position)
+    });
+
+    this.map.fitBounds(this.bounds);
+
+    /**
+     * Faz requisição que traz uma lista de artigos relacionados com o nome do lugar
+     */
+    function getWikiArticlesUrls() {
+        self.places().forEach(function(place) {
             let articles = [];
             let wikipediaUrl = 'https://www.wikipedia.org/w/api.php?action=opensearch&search=' +
             place.name() + '&format=json&callback=wikiCallback';
@@ -87,21 +101,18 @@ let ViewModel = function () {
                 dataType: 'jsonp',
                 success: function(response) {
                     articles = response;
-                    place.wikiArticlesUrls = ko.observableArray(articles);
-                    populateInfoWindow(this, self.largeInfoWindow, place);
+                    place.wikiArticlesUrls = ko.observableArray(articles)
                 }
             });
         });
-        self.bounds.extend(self.markers[index].position)
-    });
-
-    this.map.fitBounds(this.bounds);
+    }
 
     /**
      * Essa função popula a janela quando o marcador é clicado. Será permitido apenas uma janela 
      * aberta de acordo com o clique, que será populada de acordo com a sua posição no mapa.
      * @param {*} marker 
      * @param {*} infoWindow 
+     * @param {*} place
      */
     function populateInfoWindow(marker, infoWindow, place) {
         if (infoWindow.marker != marker) {
@@ -116,22 +127,22 @@ let ViewModel = function () {
 
     /**
      * Essa função cria os elementos html inseridos na janela de cada marcador
-     * @param {*} marker 
+     * @param {*} place 
      */
     function createContentToInfoWindow(place) {
-        //let articlesListElemnts = getArticlesElements(place.wikiArticlesUrls())
-        return '<div><h3>'+ place.name() + '</h3><p>' + place.description() + '</p></div>';
+        let articlesListElemnts = getArticlesElements(place.wikiArticlesUrls())
+        return '<div><h3>'+ place.name() + '</h3><p>' + place.description() + '</p>' +
+        '<h4>Artigos na Wikipedia Relacionados</h4><ul>'+ articlesListElemnts + '</ul></div>';
     }
 
     /**
      * Cria um elemento para cada artigo encontrado com o nome do lugar clicado e retorna uma string 
-     * @param {*} placeName 
+     * @param {*} wikipediaArticles 
      */
     function getArticlesElements(wikipediaArticles) {
         let listElements = '';
         if (!wikipediaArticles)
             return '';
-        
         wikipediaArticles[1].forEach(function(articleTitle){
             let url = 'http://www.wikipedia.org/wiki/' + articleTitle;
             let li = '<li><a href="' + url + '">'+ articleTitle +'</a></li>';
@@ -139,7 +150,6 @@ let ViewModel = function () {
         })
         return listElements;
     }
-
 
 };
 
