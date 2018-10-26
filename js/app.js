@@ -8,7 +8,7 @@ let mockPlaces = [
         wikiArticlesUrls: []
     },
     {
-        name: 'Torre de TV',
+        name: 'Torre de TV de Brasília',
         description: 'Torre de transmissão de TV analógica inaugurada em 1967',
         lat: -15.789632,
         lng: -47.894358,
@@ -49,7 +49,11 @@ let ViewModel = function () {
 
     let self = this;
     this.markers = [];
-    this.wikipediaArticles = []
+    this.wikipediaArticles = [];
+    this.defaultIconMarker = createMarkersIcons('8C489F');
+    this.clickedIcon = createMarkersIcons('C3C3E5');
+    this.largeInfoWindow = new google.maps.InfoWindow();
+    this.bounds = new google.maps.LatLngBounds();
     
     //cria o mapa onde são informadas as coordenadas e o zoom inicial do mapa
     this.map = new google.maps.Map(document.getElementById('map'), {
@@ -64,8 +68,6 @@ let ViewModel = function () {
     });
 
     getWikiArticlesUrls();
-    this.largeInfoWindow = new google.maps.InfoWindow();
-    this.bounds = new google.maps.LatLngBounds();
 
     //percorre a lista de lugares e cria um marcador para cada um
     this.places().forEach(function(place) {
@@ -77,16 +79,33 @@ let ViewModel = function () {
             position: position,
             title: title,
             animation: google.maps.Animation.DROP,
+            icon: self.defaultIconMarker,
             id: index
         });
         self.markers.push(marker);
         marker.addListener('click', function() {
+            this.setIcon(self.clickedIcon)
             populateInfoWindow(this, self.largeInfoWindow, place);
         });
         self.bounds.extend(self.markers[index].position)
     });
 
     this.map.fitBounds(this.bounds);
+
+    /**
+     * Essa função cria ícones para os marcadores com a cor passada através do parâmetro.
+     * @param {*} markerIconColor 
+     */
+    function createMarkersIcons(markerIconColor) {
+        var markerImage = new google.maps.MarkerImage(
+          'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerIconColor +
+          '|40|_|%E2%80%A2',
+          new google.maps.Size(21, 34),
+          new google.maps.Point(0, 0),
+          new google.maps.Point(10, 34),
+          new google.maps.Size(21,34));
+        return markerImage;
+    }
 
     /**
      * Faz requisição que traz uma lista de artigos relacionados com o nome do lugar
@@ -115,23 +134,42 @@ let ViewModel = function () {
      * @param {*} place
      */
     function populateInfoWindow(marker, infoWindow, place) {
+        let streetViewService = new google.maps.StreetViewService();
+        const radius = 50;
         if (infoWindow.marker != marker) {
             infoWindow.marker = marker;
-            infoWindow.setContent(createContentToInfoWindow(place));
-            infoWindow.open(this.map, marker)
+            infoWindow.setContent('');
             infoWindow.addListener('closeclick', function() {
                 infoWindow.setMarker = null;
+                marker.setIcon(self.defaultIconMarker);
             });
         }
+        function getStreetView(data, status) {
+            let nearStreetViewPlace = data.location.latLng;
+            let heading = google.maps.geometry.spherical.computeHeading(nearStreetViewPlace, marker.position);
+            infoWindow.setContent(createContentToInfoWindow(place, status));
+            let panoramaOptions = {
+                position: nearStreetViewPlace,
+                pov: {
+                    heading: heading,
+                    pitch: 30
+                }
+            }
+            let panorama = new google.maps.StreetViewPanorama(document.getElementById('street-view'), panoramaOptions);
+        };
+        streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
+        infoWindow.open(this.map, marker)
     }
 
     /**
      * Essa função cria os elementos html inseridos na janela de cada marcador
      * @param {*} place 
      */
-    function createContentToInfoWindow(place) {
+    function createContentToInfoWindow(place, status) {
         let articlesListElemnts = getArticlesElements(place.wikiArticlesUrls())
+        let streetViewElement = getStreetViewElement(status);
         return '<div><h3>'+ place.name() + '</h3><p>' + place.description() + '</p>' +
+        '<h4>Google Street View</h4>'+ streetViewElement +
         '<h4>Artigos na Wikipedia Relacionados</h4><ul>'+ articlesListElemnts + '</ul></div>';
     }
 
@@ -143,6 +181,8 @@ let ViewModel = function () {
         let listElements = '';
         if (!wikipediaArticles)
             return '';
+        if (wikipediaArticles[1].length === 0)
+            return '<span>Não há artigos relacionados...</span>';
         wikipediaArticles[1].forEach(function(articleTitle){
             let url = 'http://www.wikipedia.org/wiki/' + articleTitle;
             let li = '<li><a href="' + url + '">'+ articleTitle +'</a></li>';
@@ -151,6 +191,16 @@ let ViewModel = function () {
         return listElements;
     }
 
+    /**
+     * Essa função retorna um div caso haja um Street View para o local ou
+     *  uma mensagem infomando que não há uma street view
+     * @param {*} status 
+     */
+    function getStreetViewElement(status) {
+        if (status === 'OK')
+            return '<div id="street-view"></div>';
+        return '<span>Street View não encontrado</span>';
+    }
 };
 
 function initMap() {
