@@ -9,32 +9,39 @@ let mockPlaces = [
     },
     {
         name: 'Torre de TV de Brasília',
-        description: 'Torre de transmissão de TV analógica inaugurada em 1967',
+        description: 'Torre de transmissão de TV analógica inaugurada em 1967.',
         lat: -15.789632,
         lng: -47.894358,
         wikiArticlesUrls: []
     },
     {
         name: 'Estádio Nacional Mané Garrincha',
-        description: 'Estádio construído voltado para jogos da Copa do Mundo de 2014',
+        description: 'Estádio construído voltado para jogos da Copa do Mundo de 2014.',
         lat: -15.7835191,
         lng: -47.899211,
         wikiArticlesUrls: []
     },
     {
         name: 'Palácio do Planalto',
-        description: 'Sede do poder executivo da Republica Federativa do Brasil',
+        description: 'Sede do poder executivo da Republica Federativa do Brasil.',
         lat: -15.7990489,
         lng: -47.8607689,
         wikiArticlesUrls: []
     },
     {
         name: 'Supremo Tribunal Federal',
-        description: 'Sede do poder judiciário da Republica Federativa do Brasil',
+        description: 'Sede do poder judiciário da Republica Federativa do Brasil.',
         lat: -15.8021689,
         lng: -47.8618524,
         wikiArticlesUrls: []
-    }
+    },
+    {
+        name: 'Conjunto Nacional',
+        description: 'Primeiro shopping não só de Brasília, mas também do Centro-Oeste, construído em 1971.',
+        lat: -15.791202,
+        lng: -47.883186,
+        wikiArticlesUrls: []
+    },
 ]
 
 let Place = function(data) {
@@ -48,12 +55,13 @@ let Place = function(data) {
 let ViewModel = function () {
 
     let self = this;
-    this.markers = [];
+    this.markers = ko.observableArray([]);
     this.wikipediaArticles = [];
     this.defaultIconMarker = createMarkersIcons('8C489F');
     this.clickedIcon = createMarkersIcons('C3C3E5');
     this.largeInfoWindow = new google.maps.InfoWindow();
     this.bounds = new google.maps.LatLngBounds();
+    this.stringFilter = ko.observable('');
     
     //cria o mapa onde são informadas as coordenadas e o zoom inicial do mapa
     this.map = new google.maps.Map(document.getElementById('map'), {
@@ -69,6 +77,16 @@ let ViewModel = function () {
 
     getWikiArticlesUrls();
 
+    this.stringFilter().on('change', function() {
+        let stringFilter = self.$inputFilterEl.val().toLowerCase();
+        self.places().forEach(function(place) {
+            let index = self.places().indexOf(place);
+            if (!place.name().toLowerCase().includes(stringFilter))
+                self.places().splice(index, 1);
+                console.log(self.places().length)
+        });
+    });
+
     //percorre a lista de lugares e cria um marcador para cada um
     this.places().forEach(function(place) {
         let position = {lat: place.lat(), lng: place.lng()};
@@ -82,12 +100,12 @@ let ViewModel = function () {
             icon: self.defaultIconMarker,
             id: index
         });
-        self.markers.push(marker);
+        self.markers().push(marker);
         marker.addListener('click', function() {
             this.setIcon(self.clickedIcon)
             populateInfoWindow(this, self.largeInfoWindow, place);
         });
-        self.bounds.extend(self.markers[index].position)
+        self.bounds.extend(self.markers()[index].position)
     });
 
     this.map.fitBounds(this.bounds);

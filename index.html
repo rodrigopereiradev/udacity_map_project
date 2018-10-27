@@ -3,23 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Udacity Project Map</title>
-    <!--Esse style é necessário para a renderização do mapa-->
-    <style>
-        #map {
-            height: 100%;
-        }
-        #street-view {
-            width: 100%;
-            height: 200px;
-        }
-        html, body {
-            height: 100%;
-        }
-    </style>
+    <link rel="stylesheet" href="css/app.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 </head>
 <body>
+    <div class="container-fluid panel">
+        <div>
+            <input data-bind="value: stringFilter" type="text" class="input-filter" placeholder="procure seu lugar preferido...">
+        </div>
+        <div class="places-list">
+            <h2>Places encontrados</h2>
+            <ul data-bind="foreach: places">
+                <li><span data-bind="text: name"></span></li>
+            </ul>
+        </div>
+    </div>
     <div class="container-fluid" id="map"></div>
-    <div class="" id="map"></div>
 </body>
 <script src="js/lib/jquery/jquery-3.3.1.min.js"></script>
 <script src="js/lib/knockout/knockout-3.2.0.js"></script>
