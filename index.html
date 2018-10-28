@@ -9,11 +9,11 @@
 <body>
     <div class="container-fluid panel">
         <div>
-            <input data-bind="value: stringFilter" type="text" class="input-filter" placeholder="procure seu lugar preferido...">
+            <input id="places-filter" data-bind="value: stringFilter, valueUpdate: 'afterkeydown'" type="text" class="input-filter" placeholder="procure seu lugar preferido...">
         </div>
         <div class="places-list">
             <h2>Places encontrados</h2>
-            <ul data-bind="foreach: places">
+            <ul id="filtered-list" data-bind="foreach: filteredPlaces">
                 <li><span data-bind="text: name"></span></li>
             </ul>
         </div>

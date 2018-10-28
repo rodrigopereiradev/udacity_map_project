@@ -56,7 +56,7 @@ let ViewModel = function () {
 
     let self = this;
     this.markers = ko.observableArray([]);
-    this.wikipediaArticles = [];
+    this.places = ko.observableArray([]);
     this.defaultIconMarker = createMarkersIcons('8C489F');
     this.clickedIcon = createMarkersIcons('C3C3E5');
     this.largeInfoWindow = new google.maps.InfoWindow();
@@ -69,46 +69,67 @@ let ViewModel = function () {
         zoom: 15
     });
 
-    this.places = ko.observableArray([]);
-
-    mockPlaces.forEach(function(place) {
-        self.places.push(new Place(place));
+    //cria uma lista com todos os lugares encontrados
+    this.places = ko.computed(function() {
+        mockPlaces.forEach(function(place) {
+            self.places().push(new Place(place));
+        });
+        return self.places();
     });
 
     getWikiArticlesUrls();
 
-    this.stringFilter().on('change', function() {
-        let stringFilter = self.$inputFilterEl.val().toLowerCase();
+    this.markers = ko.computed(function() {
         self.places().forEach(function(place) {
             let index = self.places().indexOf(place);
-            if (!place.name().toLowerCase().includes(stringFilter))
-                self.places().splice(index, 1);
-                console.log(self.places().length)
+            let marker = createMarker(place);
+            self.markers().push(marker);
+            marker.addListener('click', function() {
+                this.setIcon(self.clickedIcon)
+                this.wikiArticlesUrls = place.wikiArticlesUrls();
+                populateInfoWindow(this, self.largeInfoWindow);
+            });
         });
-    });
+        return self.markers();
+    })
 
-    //percorre a lista de lugares e cria um marcador para cada um
-    this.places().forEach(function(place) {
-        let position = {lat: place.lat(), lng: place.lng()};
-        let title = place.name();
-        let index = self.places().indexOf(place);
-        let marker = new google.maps.Marker({
-            map: self.map,
-            position: position,
-            title: title,
-            animation: google.maps.Animation.DROP,
-            icon: self.defaultIconMarker,
-            id: index
-        });
-        self.markers().push(marker);
-        marker.addListener('click', function() {
-            this.setIcon(self.clickedIcon)
-            populateInfoWindow(this, self.largeInfoWindow, place);
-        });
-        self.bounds.extend(self.markers()[index].position)
-    });
+    this.filteredPlaces = ko.computed(function() {
+        let filteredPlaces = ko.observableArray([]);
+        filteredPlaces = filterPlacesList(filteredPlaces);
+        filterMarkers();
+        return filteredPlaces();
+    })
 
-    this.map.fitBounds(this.bounds);
+    ko.bindingHandlers.scrollPlaces = {
+        update: function(elementm, valueAccessor) {
+            let perfectScrollbar = new PerfectScrollbar('#filtered-list');
+            perfectScrollbar.update();
+        }
+    }
+
+    function filterPlacesList(filteredPlaces) {
+        self.places().map(function(place){
+            if (place.name().toLowerCase().includes(self.stringFilter().toLowerCase()))
+            filteredPlaces().push(place);
+        });
+        return filteredPlaces;
+    }
+
+    function filterMarkers() {
+        self.markers().map(function(marker){
+            if (marker.title.toLowerCase().includes(self.stringFilter().toLowerCase())) {
+                showMarker(marker);
+            } else {
+                marker.setMap(null);
+            }
+        });
+    }
+
+    function showMarker(marker) {
+        marker.setMap(self.map);
+        self.bounds.extend(marker.position)
+        self.map.fitBounds(self.bounds);
+    }
 
     /**
      * Essa função cria ícones para os marcadores com a cor passada através do parâmetro.
@@ -130,17 +151,35 @@ let ViewModel = function () {
      */
     function getWikiArticlesUrls() {
         self.places().forEach(function(place) {
-            let articles = [];
             let wikipediaUrl = 'https://www.wikipedia.org/w/api.php?action=opensearch&search=' +
             place.name() + '&format=json&callback=wikiCallback';
             $.ajax({
                 url: wikipediaUrl,
                 dataType: 'jsonp',
                 success: function(response) {
-                    articles = response;
-                    place.wikiArticlesUrls = ko.observableArray(articles)
+                    place.wikiArticlesUrls = ko.observableArray(response);
                 }
             });
+        });
+    }
+
+    /**
+     * Essa funcão cria um marcador para cada lugar
+     * @param {*} place 
+     */
+    function createMarker(place) {
+        let position = {lat: place.lat(), lng: place.lng()};
+        let title = place.name();
+        let index = self.places().indexOf(place);
+        return new google.maps.Marker({
+            map: self.map,
+            position: position,
+            title: title,
+            description: place.description(),
+            wikiArticlesUrls: place.wikiArticlesUrls(),
+            animation: google.maps.Animation.DROP,
+            icon: self.defaultIconMarker,
+            id: index
         });
     }
 
@@ -151,7 +190,7 @@ let ViewModel = function () {
      * @param {*} infoWindow 
      * @param {*} place
      */
-    function populateInfoWindow(marker, infoWindow, place) {
+    function populateInfoWindow(marker, infoWindow) {
         let streetViewService = new google.maps.StreetViewService();
         const radius = 50;
         if (infoWindow.marker != marker) {
@@ -165,7 +204,7 @@ let ViewModel = function () {
         function getStreetView(data, status) {
             let nearStreetViewPlace = data.location.latLng;
             let heading = google.maps.geometry.spherical.computeHeading(nearStreetViewPlace, marker.position);
-            infoWindow.setContent(createContentToInfoWindow(place, status));
+            infoWindow.setContent(createContentToInfoWindow(marker, status));
             let panoramaOptions = {
                 position: nearStreetViewPlace,
                 pov: {
@@ -183,10 +222,10 @@ let ViewModel = function () {
      * Essa função cria os elementos html inseridos na janela de cada marcador
      * @param {*} place 
      */
-    function createContentToInfoWindow(place, status) {
-        let articlesListElemnts = getArticlesElements(place.wikiArticlesUrls())
+    function createContentToInfoWindow(marker, status) {
+        let articlesListElemnts = getArticlesElements(marker.wikiArticlesUrls);
         let streetViewElement = getStreetViewElement(status);
-        return '<div><h3>'+ place.name() + '</h3><p>' + place.description() + '</p>' +
+        return '<div><h3>'+ marker.title + '</h3><p>' + marker.description + '</p>' +
         '<h4>Google Street View</h4>'+ streetViewElement +
         '<h4>Artigos na Wikipedia Relacionados</h4><ul>'+ articlesListElemnts + '</ul></div>';
     }
@@ -199,7 +238,7 @@ let ViewModel = function () {
         let listElements = '';
         if (!wikipediaArticles)
             return '';
-        if (wikipediaArticles[1].length === 0)
+        if (wikipediaArticles.length === 0 || wikipediaArticles[1].length === 0)
             return '<span>Não há artigos relacionados...</span>';
         wikipediaArticles[1].forEach(function(articleTitle){
             let url = 'http://www.wikipedia.org/wiki/' + articleTitle;
