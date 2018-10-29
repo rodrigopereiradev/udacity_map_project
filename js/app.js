@@ -1,84 +1,4 @@
 
-let mockPlaces = [{
-    name: 'Congresso Nacional',
-    description: 'Sede do poder legislativo da Republica Federativa do Brasil',
-    lat: -15.7997119,
-    lng: -47.8641629,
-    wikiArticlesUrls: []
-}, {
-    name: 'Torre de TV de Brasília',
-    description: 'Torre de transmissão de TV analógica inaugurada em 1967.',
-    lat: -15.789632,
-    lng: -47.894358,
-    wikiArticlesUrls: []
-}, {
-    name: 'Estádio Nacional Mané Garrincha',
-    description: 'Estádio construído voltado para jogos da Copa do Mundo de 2014.',
-    lat: -15.7835191,
-    lng: -47.899211,
-    wikiArticlesUrls: []
-}, {
-    name: 'Palácio do Planalto',
-    description: 'Sede do poder executivo da Republica Federativa do Brasil.',
-    lat: -15.7990489,
-    lng: -47.8607689,
-    wikiArticlesUrls: []
-}, {
-    name: 'Supremo Tribunal Federal',
-    description: 'Sede do poder judiciário da Republica Federativa do Brasil.',
-    lat: -15.8021689,
-    lng: -47.8618524,
-    wikiArticlesUrls: []
-}, {
-    name: 'Conjunto Nacional',
-    description: 'Primeiro shopping não só de Brasília, mas também do Centro-Oeste, construído em 1971.',
-    lat: -15.791202,
-    lng: -47.883186,
-    wikiArticlesUrls: []
-}, {
-    name: 'Rodoviaria do Plano Piloto',
-    description: 'Considerada o marco zero da capital sendo ponto de cruzamento entre os pontos rodoviários eixo sul, norte e monumental (leste e oeste).',
-    lat: -15.793252,
-    lng: -47.882641,
-    wikiArticlesUrls: []
-}, {
-    name: 'Brasília Shopping',
-    description: 'Shopping Center inaugurado em 1997.',
-    lat: -15.786382,
-    lng: -47.889006,
-    wikiArticlesUrls: []
-}, {
-    name: 'Pátio Brasil Shopping',
-    description: 'Shopping Center inaugurado em 1997.',
-    lat: -15.795690,
-    lng: -47.892005,
-    wikiArticlesUrls: []
-}, {
-    name: 'Catedral de Brasília',
-    description: 'Moderna igreja católica projetada por Niemeyer em 1970. Contém vitrais e esculturas.',
-    lat: -15.798001,
-    lng: -47.875561,
-    wikiArticlesUrls: []
-}, {
-    name: 'Teatro Nacional Cláudio Santoro',
-    description: 'Teatro com arquitetura arrojada que recebe musicais e peças teatrais patrocinadas pelo governo.',
-    lat: -15.791901,
-    lng: -47.880248,
-    wikiArticlesUrls: []
-}, {
-    name: 'Palácio do Itamaraty',
-    description: 'Edifício futurista projetado por Oscar Niemeyer com jardins e obras de arte. Também conhecido como Itamaraty.',
-    lat: -15.800350,
-    lng: -47.867232,
-    wikiArticlesUrls: []
-}, {
-    name: 'Praça dos Três Poderes',
-    description: 'Famosa praça projetada por Niemeyer onde está a sede do governo e a maior bandeira hasteada perene do mundo.',
-    lat: -15.800043,
-    lng: -47.861284,
-    wikiArticlesUrls: []
-}]
-
 let Place = function(data) {
     this.name = ko.observable(data.name);
     this.description = ko.observable(data.description)
@@ -92,6 +12,7 @@ let ViewModel = function () {
     let self = this;
     this.markers = ko.observableArray([]);
     this.places = ko.observableArray([]);
+    this.filteredPlaces = ko.observableArray([]);
     this.defaultIconMarker = createMarkersIcons('0099FF');
     this.clickedIcon = createMarkersIcons('526C85');
     this.largeInfoWindow = new google.maps.InfoWindow();
@@ -104,17 +25,40 @@ let ViewModel = function () {
         zoom: 14
     });
 
-    //cria uma lista com todos os lugares encontrados
-    this.places = ko.computed(function() {
-        mockPlaces.forEach(function(place) {
-            self.places().push(new Place(place));
-        });
-        return self.places();
-    });
+    initPlacesAndMarkers();
 
-    getWikiArticlesUrls();
 
-    this.markers = ko.computed(function() {
+    function initPlacesAndMarkers() {
+        let mockPlacesUrl = 'http://weathered-feather-7676.getsandbox.com/places';
+            $.ajax({
+                url: mockPlacesUrl,
+                dataType: 'json',
+                success: function(response) {
+                    self.places = ko.computed(addItensToPlacesList(response));
+                    getWikiArticlesUrls();
+                    self.markers = ko.computed(createAndAddMarkersToList());
+                    self.filteredPlaces = ko.computed(function() {
+                        let filteredPlaces = ko.observableArray([]);
+                        filteredPlaces = filterPlacesList(filteredPlaces);
+                        filterMarkers();
+                        return filteredPlaces();
+                    })
+                },
+                error: function(error) {
+                    $('.filter-container').hide();
+                }
+            });
+    }
+
+    function addItensToPlacesList(placesRequested) {
+        let places = ko.observableArray([]);
+        placesRequested.map(function(place) {
+            places().push(new Place(place));
+        })
+        return places;
+    }
+
+    function createAndAddMarkersToList() {
         self.places().forEach(function(place) {
             let index = self.places().indexOf(place);
             let marker = createMarker(place);
@@ -125,15 +69,15 @@ let ViewModel = function () {
                 populateInfoWindow(this, self.largeInfoWindow);
             });
         });
-        return self.markers();
-    })
+        return self.markers;
+    }
 
-    this.filteredPlaces = ko.computed(function() {
-        let filteredPlaces = ko.observableArray([]);
-        filteredPlaces = filterPlacesList(filteredPlaces);
-        filterMarkers();
-        return filteredPlaces();
-    })
+    // function addItensToFilteredPlaces() {
+    //     let filteredPlaces = ko.observableArray([]);
+    //     filteredPlaces = filterPlacesList(filteredPlaces);
+    //     filterMarkers();
+    //     return filteredPlaces;
+    // }
 
     ko.bindingHandlers.scrollPlaces = {
         update: function(elementm, valueAccessor) {
@@ -193,6 +137,9 @@ let ViewModel = function () {
                 dataType: 'jsonp',
                 success: function(response) {
                     place.wikiArticlesUrls = ko.observableArray(response);
+                },
+                error: function(error) {
+                    place.wikiArticlesUrls = ko.observable(error);
                 }
             });
         });
@@ -273,6 +220,8 @@ let ViewModel = function () {
         let listElements = '';
         if (!wikipediaArticles)
             return '';
+        if (wikipediaArticles.status) 
+            return '<span class="error-msg">Ocorreu um erro ao requisitar os artigos á Wikipedia</span>';
         if (wikipediaArticles.length === 0 || wikipediaArticles[1].length === 0)
             return '<span>Não há artigos relacionados...</span>';
         wikipediaArticles[1].forEach(function(articleTitle){
