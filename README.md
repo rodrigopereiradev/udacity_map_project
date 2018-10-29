@@ -11,9 +11,9 @@ Este é o projeto do módulo 4 do nanodegree Full Stack Web Developer da Udacity
 
 Uma lista dos lugares será apresentada em um painel à esquerda. Os lugares podem ser filtrados ao digitar palavras chaves no campo determinado.
 
-O markadores serão renderizados de acordo com o lugares filtrados ou não.
+O marcadores serão renderizados de acordo com os lugares filtrados ou não.
 
-A aplicação consome endpoits de duas APIs diferentes, a primeira é uma requisição feita ao GetSandBox, que retorna a lista de lugares que estão mockados na API. Segunda é uma requisição feita à WikiMedia, que retorna a lista de artigos relacionados com o nome do lugar. 
+A aplicação consome endpoits de duas APIs diferentes, a primeira é uma requisição feita ao GetSandBox, que retorna a lista de lugares que estão mockados na API. A segunda é uma requisição feita à WikiMedia, que retorna a lista de artigos relacionados com o nome do lugar, que constam na Wikipedia. 
 
 ## Licence
 
