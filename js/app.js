@@ -1,48 +1,83 @@
 
-let mockPlaces = [
-    {
-        name: 'Congresso Nacional',
-        description: 'Sede do poder legislativo da Republica Federativa do Brasil',
-        lat: -15.7997119,
-        lng: -47.8641629,
-        wikiArticlesUrls: []
-    },
-    {
-        name: 'Torre de TV de Brasília',
-        description: 'Torre de transmissão de TV analógica inaugurada em 1967.',
-        lat: -15.789632,
-        lng: -47.894358,
-        wikiArticlesUrls: []
-    },
-    {
-        name: 'Estádio Nacional Mané Garrincha',
-        description: 'Estádio construído voltado para jogos da Copa do Mundo de 2014.',
-        lat: -15.7835191,
-        lng: -47.899211,
-        wikiArticlesUrls: []
-    },
-    {
-        name: 'Palácio do Planalto',
-        description: 'Sede do poder executivo da Republica Federativa do Brasil.',
-        lat: -15.7990489,
-        lng: -47.8607689,
-        wikiArticlesUrls: []
-    },
-    {
-        name: 'Supremo Tribunal Federal',
-        description: 'Sede do poder judiciário da Republica Federativa do Brasil.',
-        lat: -15.8021689,
-        lng: -47.8618524,
-        wikiArticlesUrls: []
-    },
-    {
-        name: 'Conjunto Nacional',
-        description: 'Primeiro shopping não só de Brasília, mas também do Centro-Oeste, construído em 1971.',
-        lat: -15.791202,
-        lng: -47.883186,
-        wikiArticlesUrls: []
-    },
-]
+let mockPlaces = [{
+    name: 'Congresso Nacional',
+    description: 'Sede do poder legislativo da Republica Federativa do Brasil',
+    lat: -15.7997119,
+    lng: -47.8641629,
+    wikiArticlesUrls: []
+}, {
+    name: 'Torre de TV de Brasília',
+    description: 'Torre de transmissão de TV analógica inaugurada em 1967.',
+    lat: -15.789632,
+    lng: -47.894358,
+    wikiArticlesUrls: []
+}, {
+    name: 'Estádio Nacional Mané Garrincha',
+    description: 'Estádio construído voltado para jogos da Copa do Mundo de 2014.',
+    lat: -15.7835191,
+    lng: -47.899211,
+    wikiArticlesUrls: []
+}, {
+    name: 'Palácio do Planalto',
+    description: 'Sede do poder executivo da Republica Federativa do Brasil.',
+    lat: -15.7990489,
+    lng: -47.8607689,
+    wikiArticlesUrls: []
+}, {
+    name: 'Supremo Tribunal Federal',
+    description: 'Sede do poder judiciário da Republica Federativa do Brasil.',
+    lat: -15.8021689,
+    lng: -47.8618524,
+    wikiArticlesUrls: []
+}, {
+    name: 'Conjunto Nacional',
+    description: 'Primeiro shopping não só de Brasília, mas também do Centro-Oeste, construído em 1971.',
+    lat: -15.791202,
+    lng: -47.883186,
+    wikiArticlesUrls: []
+}, {
+    name: 'Rodoviaria do Plano Piloto',
+    description: 'Considerada o marco zero da capital sendo ponto de cruzamento entre os pontos rodoviários eixo sul, norte e monumental (leste e oeste).',
+    lat: -15.793252,
+    lng: -47.882641,
+    wikiArticlesUrls: []
+}, {
+    name: 'Brasília Shopping',
+    description: 'Shopping Center inaugurado em 1997.',
+    lat: -15.786382,
+    lng: -47.889006,
+    wikiArticlesUrls: []
+}, {
+    name: 'Pátio Brasil Shopping',
+    description: 'Shopping Center inaugurado em 1997.',
+    lat: -15.795690,
+    lng: -47.892005,
+    wikiArticlesUrls: []
+}, {
+    name: 'Catedral de Brasília',
+    description: 'Moderna igreja católica projetada por Niemeyer em 1970. Contém vitrais e esculturas.',
+    lat: -15.798001,
+    lng: -47.875561,
+    wikiArticlesUrls: []
+}, {
+    name: 'Teatro Nacional Cláudio Santoro',
+    description: 'Teatro com arquitetura arrojada que recebe musicais e peças teatrais patrocinadas pelo governo.',
+    lat: -15.791901,
+    lng: -47.880248,
+    wikiArticlesUrls: []
+}, {
+    name: 'Palácio do Itamaraty',
+    description: 'Edifício futurista projetado por Oscar Niemeyer com jardins e obras de arte. Também conhecido como Itamaraty.',
+    lat: -15.800350,
+    lng: -47.867232,
+    wikiArticlesUrls: []
+}, {
+    name: 'Praça dos Três Poderes',
+    description: 'Famosa praça projetada por Niemeyer onde está a sede do governo e a maior bandeira hasteada perene do mundo.',
+    lat: -15.800043,
+    lng: -47.861284,
+    wikiArticlesUrls: []
+}]
 
 let Place = function(data) {
     this.name = ko.observable(data.name);
@@ -66,7 +101,7 @@ let ViewModel = function () {
     //cria o mapa onde são informadas as coordenadas e o zoom inicial do mapa
     this.map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: -15.7801, lng: -47.9292},
-        zoom: 15
+        zoom: 14
     });
 
     //cria uma lista com todos os lugares encontrados

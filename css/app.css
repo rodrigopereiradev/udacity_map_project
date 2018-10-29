@@ -50,9 +50,9 @@ a {
 }
 
 .input-filter {
-    border: 1px solid #C3C3E5;
+    border: 1px solid #CAE5FF;
     border-radius: 5px;
-    color: #8C489F;
+    color: #0099FF;
     width: 60%;
     padding: 2%;
     font-size: 1em;
@@ -72,4 +72,9 @@ a {
     background-color: #CAE5FF;
     color: #526C85;
     font-family: 'Roboto Condensed', sans-serif;
+}
+
+.error-msg {
+    font-family: 'Roboto Condensed', sans-serif;
+    color: red;
 }
