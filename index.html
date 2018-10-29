@@ -2,20 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Udacity Project Map</title>
+    <title>BSB Places</title>
     <link rel="stylesheet" href="css/app.css">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Lobster|Roboto|Roboto+Condensed" rel="stylesheet">
 </head>
 <body>
     <div class="container-fluid panel">
-        <div>
-            <input id="places-filter" data-bind="value: stringFilter, valueUpdate: 'afterkeydown'" type="text" class="input-filter" placeholder="procure seu lugar preferido...">
-        </div>
-        <div class="places-list">
-            <h2>Places encontrados</h2>
-            <ul id="filtered-list" data-bind="foreach: filteredPlaces">
-                <li><span data-bind="text: name"></span></li>
-            </ul>
+        <h1 class="app-title">bsbplaces.com</h1>
+        <div class="filter-container">
+            <h3>Encontre seu place prefrido</h3>
+            <div>
+                <input class="input-filter" id="places-filter" 
+                data-bind="value: stringFilter, valueUpdate: 'afterkeydown'" type="text">
+            </div>
+            <div class="places-list">
+                <ul class="filtered-list" id="filtered-list" data-bind="foreach: filteredPlaces">
+                    <li class="place-item"><span data-bind="text: name"></span></li>
+                </ul>
+            </div>
         </div>
     </div>
     <div class="container-fluid" id="map"></div>

@@ -1,15 +1,25 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+ul {
+    list-style-type: none;
+}
+
+a {
+    color: #0099FF;
+    padding: 0.5%;
+    text-decoration: none;
+}
+
 #map {
     height: 100%;
     bottom: 0px;
     left: 300px;
     right: 0px;
     position: absolute;
-}
-
-html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
 }
 
 #street-view {
@@ -20,17 +30,46 @@ html, body {
 .panel {
     height: 100%;
     width: 30%;
-    padding: 10px;
     margin: 0px;
-    background-color: #F1F0FF;
-    font-family: 'Roboto', sans-serif;
+    background-color: #CAE5FF;
+    font-family: 'Roboto Condensed', sans-serif;
+}
+
+.filter-container {
+    margin-left: 3%;
+    color: #526C85;
+}
+
+.app-title {
+    margin-top: 0%;
+    padding: 10% 7% 10%;
+    font-size: 2.5rem;
+    background-color: #0099FF;
+    color: #ffffff;
+    font-family: 'Lobster', cursive;
 }
 
 .input-filter {
     border: 1px solid #C3C3E5;
-    border-radius: 3px;
+    border-radius: 5px;
     color: #8C489F;
     width: 60%;
+    padding: 2%;
     font-size: 1em;
-    padding: 5px;
+}
+
+.filtered-list {
+    padding-left: 2%;
+}
+
+.place-item {
+    padding: 2%;
+}
+
+.info-window {
+    margin: 0%;
+    padding: 3%;
+    background-color: #CAE5FF;
+    color: #526C85;
+    font-family: 'Roboto Condensed', sans-serif;
 }

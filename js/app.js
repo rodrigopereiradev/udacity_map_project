@@ -57,8 +57,8 @@ let ViewModel = function () {
     let self = this;
     this.markers = ko.observableArray([]);
     this.places = ko.observableArray([]);
-    this.defaultIconMarker = createMarkersIcons('8C489F');
-    this.clickedIcon = createMarkersIcons('C3C3E5');
+    this.defaultIconMarker = createMarkersIcons('0099FF');
+    this.clickedIcon = createMarkersIcons('526C85');
     this.largeInfoWindow = new google.maps.InfoWindow();
     this.bounds = new google.maps.LatLngBounds();
     this.stringFilter = ko.observable('');
@@ -225,7 +225,7 @@ let ViewModel = function () {
     function createContentToInfoWindow(marker, status) {
         let articlesListElemnts = getArticlesElements(marker.wikiArticlesUrls);
         let streetViewElement = getStreetViewElement(status);
-        return '<div><h3>'+ marker.title + '</h3><p>' + marker.description + '</p>' +
+        return '<div class="info-window" ><h3>'+ marker.title + '</h3><p>' + marker.description + '</p>' +
         '<h4>Google Street View</h4>'+ streetViewElement +
         '<h4>Artigos na Wikipedia Relacionados</h4><ul>'+ articlesListElemnts + '</ul></div>';
     }
