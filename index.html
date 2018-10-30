@@ -5,11 +5,12 @@
     <title>BSB Places</title>
     <link rel="stylesheet" href="css/app.css">
     <link href="https://fonts.googleapis.com/css?family=Lobster|Roboto|Roboto+Condensed" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container-fluid panel">
         <h1 class="app-title">bsbplaces.com</h1>
-        <div class="filter-container">
+        <div data-bind="ifnot: hasErrorLoadingPlaces"  class="filter-container">
             <h3>Encontre seu place prefrido</h3>
             <div>
                 <input class="input-filter" id="places-filter" 
@@ -20,6 +21,13 @@
                     <li class="place-item"><span data-bind="text: name"></span></li>
                 </ul>
             </div>
+        </div>
+        <div data-bind="if: hasErrorLoadingPlaces" class="error-guidelines-container">
+            <i class="error-msg fa fa-exclamation-triangle"></i><span class="error-msg"> Ocorreu um erro ao buscar os BSB Places. Para resolver o 
+                problema proceda de acordo com as seguintes orientações:</span>
+            <ul class="error-guidelines" data-bind="foreach: errorGuidelines">
+                <li class="error-guidelines-item"><span data-bind="text: $data"></span></li>
+            </ul>
         </div>
     </div>
     <div class="container-fluid" id="map"></div>

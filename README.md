@@ -13,7 +13,7 @@ Uma lista dos lugares será apresentada em um painel à esquerda. Os lugares pod
 
 O marcadores serão renderizados de acordo com os lugares filtrados ou não.
 
-A aplicação consome endpoits de duas APIs diferentes, a primeira é uma requisição feita ao GetSandBox, que retorna a lista de lugares que estão mockados na API. A segunda é uma requisição feita à WikiMedia, que retorna a lista de artigos relacionados com o nome do lugar, que constam na Wikipedia. 
+A aplicação consome endpoits de duas APIs diferentes, a primeira é uma requisição feita ao GetSandBox (síncrona), que retorna a lista de lugares que estão mockados na API. A segunda é uma requisição feita à WikiMedia (assíncrona), que retorna a lista de artigos relacionados com o nome do lugar, que constam na Wikipedia.
 
 ## Licence
 

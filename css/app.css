@@ -59,6 +59,10 @@ a {
 }
 
 .filtered-list {
+    width: 75%;
+    max-height: 420px;
+    position: relative;
+    overflow-y: scroll;
     padding-left: 2%;
 }
 
@@ -74,7 +78,36 @@ a {
     font-family: 'Roboto Condensed', sans-serif;
 }
 
+.error-guidelines-container {
+    padding: 3%;
+    width: 75%;
+}
+
+.error-guidelines {
+    width: 75%;
+    color: #526C85;
+    list-style-type: decimal;
+}
+
+.error-guidelines-item {
+    padding: 2%;
+}
+
 .error-msg {
     font-family: 'Roboto Condensed', sans-serif;
-    color: red;
+    color: #990033;
+}
+
+ul::-webkit-scrollbar {
+    background-color: #CAE5FF;
+    width: 2%;
+}
+
+ul::-webkit-scrollbar-thumb {
+    background: #0099FF;
+    border-radius: 6px;
+}
+
+ul::-webkit-scrollbar-track {
+    background-color: #CAE5FF;
 }

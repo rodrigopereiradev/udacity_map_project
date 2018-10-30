@@ -1,3 +1,9 @@
+const errorGuidelines = [
+    'Recarregue a página;',
+    'Verifique sua conexão de internet;',
+    'Caso as duas últimas orientações não resolvam o problema tente novamente mais tarde, pois um dos serviços externos pode estar indisponível;',
+    'Caso o problema persista entre em contato com o suporte do sistema;' 
+]
 
 let Place = function(data) {
     this.name = ko.observable(data.name);
@@ -10,46 +16,62 @@ let Place = function(data) {
 let ViewModel = function () {
 
     let self = this;
+    this.map = {};
+    this.hasErrorLoadingPlaces = ko.observable(false);
     this.markers = ko.observableArray([]);
     this.places = ko.observableArray([]);
     this.filteredPlaces = ko.observableArray([]);
+    this.errorGuidelines = ko.observableArray(errorGuidelines);
     this.defaultIconMarker = createMarkersIcons('0099FF');
     this.clickedIcon = createMarkersIcons('526C85');
     this.largeInfoWindow = new google.maps.InfoWindow();
     this.bounds = new google.maps.LatLngBounds();
     this.stringFilter = ko.observable('');
-    
-    //cria o mapa onde são informadas as coordenadas e o zoom inicial do mapa
-    this.map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: -15.7801, lng: -47.9292},
-        zoom: 14
-    });
 
+
+    createMap()
     initPlacesAndMarkers();
 
+    /**
+     * cria o mapa onde são informadas as coordenadas e o zoom inicial do mapa
+     */
+    function createMap() {
+        self.map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: -15.7801, lng: -47.9292},
+            zoom: 14
+        });
+    }
 
+    /**
+     * Faz uma resquisição que retorna uma lista de lugares mockados em uma API externa.
+     */
     function initPlacesAndMarkers() {
         let mockPlacesUrl = 'http://weathered-feather-7676.getsandbox.com/places';
             $.ajax({
                 url: mockPlacesUrl,
+                async: false,
                 dataType: 'json',
                 success: function(response) {
+                    // Em caso de sucesso na requisição a lista de lugares, macadores 
+                    //e lugares filtrados são alimentadas.
                     self.places = ko.computed(addItensToPlacesList(response));
                     getWikiArticlesUrls();
                     self.markers = ko.computed(createAndAddMarkersToList());
-                    self.filteredPlaces = ko.computed(function() {
-                        let filteredPlaces = ko.observableArray([]);
-                        filteredPlaces = filterPlacesList(filteredPlaces);
-                        filterMarkers();
-                        return filteredPlaces();
-                    })
+                    addItensToFilteredPlaces();
                 },
                 error: function(error) {
-                    $('.filter-container').hide();
+                    //Em caso de erro o container com orientações é mostrado na tela 
+                    //e o containder com a lista é escondido.
+                    self.hasErrorLoadingPlaces = ko.observable(true);
                 }
             });
     }
 
+    /**
+     * Adiciona os lugares retornados na reuisição ao SandBox à lista de lugares.
+     * É criada uma instancia de Place para cada lugar retornados. 
+     * @param {*} placesRequested 
+     */
     function addItensToPlacesList(placesRequested) {
         let places = ko.observableArray([]);
         placesRequested.map(function(place) {
@@ -58,6 +80,9 @@ let ViewModel = function () {
         return places;
     }
 
+    /**
+     * Cria e adiciona marcadores à lista de marcadores 
+     */
     function createAndAddMarkersToList() {
         self.places().forEach(function(place) {
             let index = self.places().indexOf(place);
@@ -72,13 +97,19 @@ let ViewModel = function () {
         return self.markers;
     }
 
-    // function addItensToFilteredPlaces() {
-    //     let filteredPlaces = ko.observableArray([]);
-    //     filteredPlaces = filterPlacesList(filteredPlaces);
-    //     filterMarkers();
-    //     return filteredPlaces;
-    // }
+    /**
+     * Adiciona places à lista de lugares filtrados.
+     */
+    function addItensToFilteredPlaces() {
+        self.filteredPlaces = ko.computed(function() {
+            let filteredPlaces = ko.observableArray([]);
+            filteredPlaces = filterPlacesList(filteredPlaces);
+            filterMarkers();
+            return filteredPlaces();
+        })
+    }
 
+    // lida com a atualizaçao dos elementos da lista de lugares filtrados.
     ko.bindingHandlers.scrollPlaces = {
         update: function(elementm, valueAccessor) {
             let perfectScrollbar = new PerfectScrollbar('#filtered-list');
@@ -86,6 +117,10 @@ let ViewModel = function () {
         }
     }
 
+    /**
+     * Faz a filtragem dos lugares de acordo com o que digitado no input.
+     * @param {*} filteredPlaces 
+     */
     function filterPlacesList(filteredPlaces) {
         self.places().map(function(place){
             if (place.name().toLowerCase().includes(self.stringFilter().toLowerCase()))
@@ -94,6 +129,10 @@ let ViewModel = function () {
         return filteredPlaces;
     }
 
+    /**
+     * Faz a filtragem dos marcadores de acordo com o que digitado no input. Caso o resoltado
+     * da validação seja verdadeiro, o marcador é mostrado na tela.
+     */
     function filterMarkers() {
         self.markers().map(function(marker){
             if (marker.title.toLowerCase().includes(self.stringFilter().toLowerCase())) {
@@ -104,6 +143,10 @@ let ViewModel = function () {
         });
     }
 
+    /**
+     *  Mostra o marcador na tela conforme solicitado.
+     * @param {*} marker 
+     */
     function showMarker(marker) {
         marker.setMap(self.map);
         self.bounds.extend(marker.position)
@@ -221,7 +264,7 @@ let ViewModel = function () {
         if (!wikipediaArticles)
             return '';
         if (wikipediaArticles.status) 
-            return '<span class="error-msg">Ocorreu um erro ao requisitar os artigos á Wikipedia</span>';
+            return '<i class="error-msg fa fa-exclamation-triangle"></i><span class="error-msg"> Ocorreu um erro ao requisitar os artigos da Wikipedia</span>';
         if (wikipediaArticles.length === 0 || wikipediaArticles[1].length === 0)
             return '<span>Não há artigos relacionados...</span>';
         wikipediaArticles[1].forEach(function(articleTitle){
@@ -242,9 +285,9 @@ let ViewModel = function () {
             return '<div id="street-view"></div>';
         return '<span>Street View não encontrado</span>';
     }
+
 };
 
 function initMap() {
     ko.applyBindings(new ViewModel());
 }
-
