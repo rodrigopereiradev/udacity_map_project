@@ -1,8 +1,5 @@
 # Projeto BSB Places (Mapa do Bairro)
 
-Este é o segundo projeto do nanodegree Full Stack Web Developer da Udacity, que pode ser usado como portfolio para 
-trabalhos futuros.
-
 Este é o projeto do módulo 4 do nanodegree Full Stack Web Developer da Udacity, que consiste em um mapa com marcadares de lugares de Brasília.
 
 ## Rodando a aplicação
