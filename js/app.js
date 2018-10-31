@@ -307,7 +307,7 @@ let ViewModel = function () {
             return '<span>Não há artigos relacionados...</span>';
         wikipediaArticles[1].forEach(function(articleTitle){
             let url = 'http://www.wikipedia.org/wiki/' + articleTitle;
-            let li = '<li><a href="' + url + '">'+ articleTitle +'</a></li>';
+            let li = '<li><a href="' + url + '" target="_blank">'+ articleTitle +'</a></li>';
             listElements = listElements + li
         })
         return listElements;
