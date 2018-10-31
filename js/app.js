@@ -15,6 +15,8 @@ let Place = function(data) {
 
 let ViewModel = function () {
 
+    $('.closed-panel').hide();
+
     let self = this;
     this.map = {};
     this.hasErrorLoadingPlaces = ko.observable(false);
@@ -31,6 +33,16 @@ let ViewModel = function () {
 
     createMap()
     initPlacesAndMarkers();
+
+    this.hidePlacesList = function() {
+        $('.panel').hide();
+        $('.closed-panel').show()
+    }
+
+    this.showPlaceList = function() {
+        $('.panel').show();
+        $('.closed-panel').hide()
+    }
 
     /**
      * cria o mapa onde são informadas as coordenadas e o zoom inicial do mapa
