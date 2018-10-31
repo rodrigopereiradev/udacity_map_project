@@ -39,12 +39,12 @@ a {
     width:10%;
     margin: 0px;
     background-color: #0099FF;
-    font-family: 'Roboto Condensed', sans-serif;
 }
 
 .filter-container {
     margin-left: 3%;
     color: #526C85;
+    font-family: 'Roboto Condensed', sans-serif;
 }
 
 .title-container {
@@ -73,20 +73,27 @@ a {
     color: #ffffff;
 }
 
+.filter-title {
+    font-size: 60px;
+}
+
 .input-filter {
-    border: 1px solid #CAE5FF;
+    border: 1px solid #0099FF;
     border-radius: 5px;
     color: #0099FF;
     width: 90%;
+    height: 50px;
     padding: 2%;
-    font-size: 1em;
+    font-size: 50px;
 }
 
 .filtered-list {
-    max-height: 420px;
+    height: 850px;
+    width: 98%;
     position: relative;
     overflow-y: scroll;
     padding-left: 2%;
+    font-size: 50px;
 }
 
 .place-item {
@@ -106,16 +113,18 @@ a.place-link:hover {
     padding: 3%;
     background-color: #CAE5FF;
     color: #526C85;
+    font-size: 40px;
     font-family: 'Roboto Condensed', sans-serif;
 }
 
 .error-guidelines-container {
-    padding: 3%;
-    width: 75%;
+    width: 100%;
+    font-size: 40px;
 }
 
 .error-guidelines {
-    width: 75%;
+    width: 90%;
+    margin-left: 15px; 
     color: #526C85;
     list-style-type: decimal;
 }
