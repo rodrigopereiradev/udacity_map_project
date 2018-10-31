@@ -69,8 +69,8 @@ let ViewModel = function () {
      */
     function createMap() {
         self.map = new google.maps.Map(document.getElementById('map'), {
-            center: {lat: -15.7801, lng: -47.9292},
-            zoom: 14
+            center: {lat: -15.794062, lng: -47.882757},
+            zoom: 13
         });
     }
 
@@ -118,13 +118,17 @@ let ViewModel = function () {
     function createAndAddMarkersToList() {
         self.places().forEach(function(place) {
             let index = self.places().indexOf(place);
-            let marker = createMarker(place);
-            self.markers().push(marker);
-            marker.addListener('click', function() {
+            let timeout = index * 200;
+            let marker = {};
+            window.setTimeout(function() {
+                marker = createMarker(place);
+                self.markers().push(marker);
+                marker.addListener('click', function() {
                 this.setIcon(self.clickedIcon)
                 this.wikiArticlesUrls = place.wikiArticlesUrls();
                 populateInfoWindow(this, self.largeInfoWindow);
             });
+            }, timeout);
         });
         return self.markers;
     }
@@ -254,6 +258,7 @@ let ViewModel = function () {
             infoWindow.marker = marker;
             infoWindow.setContent('');
             infoWindow.addListener('closeclick', function() {
+                marker.setAnimation(google.maps.Animation.DROP)
                 infoWindow.setMarker = null;
                 marker.setIcon(self.defaultIconMarker);
             });
@@ -272,6 +277,7 @@ let ViewModel = function () {
             let panorama = new google.maps.StreetViewPanorama(document.getElementById('street-view'), panoramaOptions);
         };
         streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
+        marker.setAnimation(google.maps.Animation.BOUNCE)
         infoWindow.open(this.map, marker)
     }
 
