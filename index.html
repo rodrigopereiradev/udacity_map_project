@@ -28,7 +28,7 @@
             </div>
             <div class="places-list">
                 <ul class="filtered-list" id="filtered-list" data-bind="foreach: filteredPlaces">
-                    <li class="place-item"><span data-bind="text: name"></span></li>
+                    <li class="place-item"><a class="place-link" href="#" data-bind="text: name, click: $root.openInfoWindow"></a></li>
                 </ul>
             </div>
         </div>

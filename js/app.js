@@ -34,14 +34,34 @@ let ViewModel = function () {
     createMap()
     initPlacesAndMarkers();
 
+    /**
+     * Esconde o painel com a lista de lugares
+     */
     this.hidePlacesList = function() {
         $('.panel').hide();
         $('.closed-panel').show()
     }
 
+    /**
+     * Mostra o painel com a lista de lugares
+     */
     this.showPlaceList = function() {
         $('.panel').show();
         $('.closed-panel').hide()
+    }
+
+    /**
+     * Abre uma janela com as informações de um lugar quando ele é clicado na lista de lugares.
+     * @param {*} clicledPlace 
+     */
+    this.openInfoWindow = function(clicledPlace) {
+        self.markers().forEach(function(marker) {
+            if (marker.title === clicledPlace.name()) {
+                marker.setIcon(self.clickedIcon);
+                marker.wikiArticlesUrls = clicledPlace.wikiArticlesUrls();
+                populateInfoWindow(marker, self.largeInfoWindow);
+            }
+        });
     }
 
     /**

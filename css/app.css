@@ -93,6 +93,14 @@ a {
     padding: 2%;
 }
 
+.place-link {
+    color: #526C85;
+}
+
+a.place-link:hover {
+    color: #0099FF;
+}
+
 .info-window {
     margin: 0%;
     padding: 3%;
